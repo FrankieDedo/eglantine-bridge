@@ -80,9 +80,16 @@ at the start of each session. Older consoles ignore it.
 - **Loss:** when a frame doesn't complete, the Switch drops it, stops decoding and sends `REQUEST_IDR`
   every 250 ms until a keyframe arrives. The host sends at most one keyframe every 300 ms. There is no
   error correction yet: in tests, 2% packet loss still showed about 97% of the frames.
-- **Encoders on the PC**, in order: `h264_nvenc`, `h264_qsv`, `libx264` (`ultrafast`, `zerolatency`,
-  4 sliced threads), then `h264_amf`. AMF comes last because it always writes a single slice per frame,
-  which the Switch decodes on one core only.
+- **Encoders on the PC**, in order:
+  1. FFmpeg's `h264_nvenc`, `h264_qsv`, `libx264` (`ultrafast`, `zerolatency`, 4 sliced threads), when the
+     FFmpeg the host is built with has them;
+  2. on Windows, Media Foundation: the GPU encoder (NVIDIA, AMD or Intel), kept only if a test frame comes
+     out in at least 2 slices, then Microsoft's software encoder. Both are part of Windows, so they also work
+     with a decode-only FFmpeg;
+  3. FFmpeg's `h264_amf`, which always writes a single slice per frame: the Switch then decodes on one core only.
+
+  `EBRIDGE_ENCODER=<name>` keeps only one of them (`h264_nvenc`, `h264_qsv`, `libx264`, `mf-gpu`,
+  `mf-software`, `h264_amf`). Every 5 s the host logs fps, bitrate and the average encode time.
 
 ## Audio
 

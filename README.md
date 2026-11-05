@@ -10,7 +10,7 @@ and the console sends its controls back, rumble included.
  │ Joy-Con / Pro Controller, │ ────────────► │ virtual gamepad: player 1 / handheld│
  │ touch screen, gyroscope   │               │                                    │
  │                           │   UDP video   │ Vulkan renderer → H.264 encoder    │
- │ H.264 decoder             │ ◄──────────── │ (x264, NVENC, Quick Sync)          │
+ │ H.264 decoder             │ ◄──────────── │ (GPU or x264, Media Foundation)    │
  │ audout                    │ ◄──────────── │ audio output → Opus                │
  │ vibration                 │ ◄──────────── │ game rumble                        │
  └───────────────────────────┘   UDP audio   └────────────────────────────────────┘

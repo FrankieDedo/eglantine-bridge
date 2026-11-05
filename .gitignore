@@ -21,3 +21,4 @@ keys.txt
 *.bmp
 __pycache__/
 *.pyc
+ebridge_paired.txt

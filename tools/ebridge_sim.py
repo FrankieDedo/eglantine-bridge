@@ -412,7 +412,7 @@ def run_client(host, port, pin, seconds, state_file, quiet=False, dump=None, dro
         msg_type, payload = ctl_recv(tcp)
         if msg_type == CTL_PAIR_REQUIRED:
             if pin is None:
-                pin = int(input("PIN mostrato dall'host: "))
+                pin = int(input("PIN shown on the host: "))
             log("sending PIN")
             ctl_send(tcp, CTL_PAIR_PIN, F_PIN.pack(pin))
         elif msg_type == CTL_PAIR_OK:

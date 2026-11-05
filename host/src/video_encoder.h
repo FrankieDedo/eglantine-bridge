@@ -1,5 +1,6 @@
-// H.264 encoder for the stream: picks the first hardware encoder that works
-// (NVIDIA NVENC, AMD AMF, Intel QSV), falls back to x264 on the CPU.
+// H.264 encoder for the stream. Tries, in order: FFmpeg's NVENC, QSV and x264,
+// then on Windows the Media Foundation encoders (GPU, then software), then
+// FFmpeg's AMF. All of them but AMF split each frame into 4 slices.
 #pragma once
 
 #include <cstdint>

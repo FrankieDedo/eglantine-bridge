@@ -14,7 +14,7 @@
 #include <vector>
 
 #include "ebridge_protocol.h"
-#ifdef EBRIDGE_HAVE_FFMPEG
+#ifdef EBRIDGE_HAVE_VIDEO
 #include "video_encoder.h"
 #endif
 #include <condition_variable>
@@ -601,7 +601,7 @@ struct Host::Impl {
     }
 
     void VideoLoop() {
-#ifdef EBRIDGE_HAVE_FFMPEG
+#ifdef EBRIDGE_HAVE_VIDEO
         VideoEncoder encoder;
         uint32_t open_gen = 0, frame_id = 0, seq = 0;
         std::vector<uint8_t> frame;
@@ -609,6 +609,8 @@ struct Host::Impl {
         // Stats printed every 5 s while streaming, to diagnose problems on the console side.
         uint32_t st_frames = 0, st_keys = 0, st_packets = 0;
         uint64_t st_bytes = 0;
+        double st_encode_ms = 0;
+        uint32_t st_encodes = 0;
         auto st_start = Clock::now();
         Clock::time_point last_forced_idr{};
         while (running) {
@@ -663,9 +665,12 @@ struct Host::Impl {
             }
             if (!encoder.IsOpen()) continue;
             packets.clear();
+            const auto t0 = Clock::now();
             if (!encoder.Encode(frame.data(), static_cast<int>(w), static_cast<int>(h),
                                 static_cast<int>(w * 4), force_idr, packets))
                 continue;
+            st_encode_ms += std::chrono::duration<double, std::milli>(Clock::now() - t0).count();
+            st_encodes++;
             for (const auto& p : packets) {
                 SendVideoPacket(p.data.data(), p.data.size(), p.key, frame_id++, token, to, seq);
                 st_frames++;
@@ -678,12 +683,15 @@ struct Host::Impl {
                 char line[200];
                 std::snprintf(line, sizeof line,
                               "video: %.0f fps, %.0f kbit/s, %u keyframes, %u UDP packets, "
-                              "%u keyframes asked by the console",
+                              "%u keyframes asked by the console, encode %.1f ms",
                               st_frames / secs, st_bytes * 8 / 1000.0 / secs, st_keys, st_packets,
-                              idr_request_count.exchange(0));
+                              idr_request_count.exchange(0),
+                              st_encodes ? st_encode_ms / st_encodes : 0.0);
                 Emit(Event::Log, line);
                 st_frames = st_keys = st_packets = 0;
                 st_bytes = 0;
+                st_encode_ms = 0;
+                st_encodes = 0;
                 st_start = Clock::now();
             }
         }

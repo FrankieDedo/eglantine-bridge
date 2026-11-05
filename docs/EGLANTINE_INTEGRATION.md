@@ -43,9 +43,11 @@ don't clash with the mouse.
 
 ## Dependencies
 
-The host library needs FFmpeg **with H.264 encoders** (`libx264`, or `h264_nvenc` / `h264_qsv` /
-`h264_amf`) and Opus, found with pkg-config. PokeDinner builds with MSYS2 UCRT64, whose FFmpeg has them.
-The FFmpeg bundled with Eden-based builds may only have the decoders NVDEC needs: check before using it.
+The host library uses the emulator's FFmpeg and Opus. The FFmpeg bundled with Eden-based Windows builds
+only has the decoders NVDEC needs, so on Windows the library also encodes through Media Foundation
+(the GPU encoder, or Microsoft's software one), which only needs Windows. On Linux and macOS the system
+FFmpeg normally has `libx264`; without an H.264 encoder the bridge connects
+but sends no video.
 
 ## Still to do before proposing it upstream
 
