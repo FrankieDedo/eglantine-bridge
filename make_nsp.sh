@@ -17,7 +17,7 @@ HBP="$ROOT/tools/hacbrewpack/hacbrewpack.exe"
 HBP_REPO=https://github.com/rlaphoenix/hacBrewPack.git
 HBP_COMMIT=745b16ecfc9ce055743067d200572204cb2aac6c
 TITLE_ID=05eb0b1d00000000
-VERSION=0.1.0
+VERSION=1.0.0
 
 TMP="$(cygpath -m "${LOCALAPPDATA:-C:/Temp}")/ebridge-switch-build"
 case "$TMP" in *" "*) TMP="C:/Temp/ebridge-switch-build" ;; esac
